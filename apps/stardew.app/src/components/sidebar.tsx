@@ -43,6 +43,7 @@ export const miscNavigation = [
 	{ name: "Bundles", href: "/bundles", icon: IconBox },
 	{ name: "Secret Notes", href: "/notes", icon: IconNote },
 	{ name: "Rarecrows", href: "/rarecrows", icon: IconCarrot },
+    { name: "Todo List", href: "/todolist", icon: IconNote },
 	{ name: "Account Settings", href: "/account", icon: IconSettings },
 ];
 

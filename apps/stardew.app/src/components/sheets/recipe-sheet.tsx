@@ -8,6 +8,7 @@ import type { CraftingRecipe, Recipe } from "@/types/recipe";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { usePlayers } from "@/contexts/players-context";
+import { useTodo } from "@/contexts/todolist-context";
 import { deweaponize } from "@/lib/utils";
 
 import { CreatePlayerRedirect } from "@/components/createPlayerRedirect";
@@ -114,6 +115,8 @@ export const RecipeSheet = <T extends Recipe>({
 			: objects[recipe.itemID.toString() as keyof typeof objects].description
 		: null;
 
+    const { addItem } = useTodo();
+
 	async function handleStatusChange(newStatus: number | null) {
 		if (!activePlayer || !recipe) return;
 
@@ -213,6 +216,19 @@ export const RecipeSheet = <T extends Recipe>({
 										</SelectGroup>
 									</SelectContent>
 								</Select>
+                                <button
+                                onClick={() =>
+                                    addItem({
+                                    id: recipe.itemID,
+                                    name: "RecipeName",
+                                    required: 1,
+                                    crafted: 0,
+                                    })
+                                }
+                                className="btn btn-primary mt-2"
+                                >
+                                    Add to To-Do List
+                                </button>
 								<div>{!activePlayer && <CreatePlayerRedirect />}</div>
 								{name && (
 									<Button
@@ -381,6 +397,7 @@ export const RecipeSheet = <T extends Recipe>({
 										</SelectGroup>
 									</SelectContent>
 								</Select>
+                                <p>Add to ToDo List</p>
 								<div>{!activePlayer && <CreatePlayerRedirect />}</div>
 								{name && (
 									<Button
