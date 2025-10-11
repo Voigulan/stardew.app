@@ -216,19 +216,22 @@ export const RecipeSheet = <T extends Recipe>({
 										</SelectGroup>
 									</SelectContent>
 								</Select>
-                                <button
-                                onClick={() =>
-                                    addItem({
-                                    id: recipe.itemID,
-                                    name: "RecipeName",
-                                    required: 1,
-                                    crafted: 0,
-                                    })
-                                }
-                                className="btn btn-primary mt-2"
-                                >
+                                <Button
+									variant={false ? "default" : "outline"}
+									onClick={() =>
+                                        addItem({
+                                        itemID: recipe.itemID,
+                                        required: 1,
+                                        crafted: 0,
+                                        })
+                                    }
+									disabled={
+										//TODO: !activePlayer
+                                        false
+									}
+								>
                                     Add to To-Do List
-                                </button>
+								</Button>
 								<div>{!activePlayer && <CreatePlayerRedirect />}</div>
 								{name && (
 									<Button
