@@ -11,6 +11,7 @@ interface TodoContextType {
     items: TodoItem[];
     addItem: (item: TodoItem) => void;
     updateCrafted: (itemID: string, crafted: number) => void;
+    updateRequired: (itemID: string, required: number) => void;
     removeItem: (itemID: string) => void;
     clearAll: () => void;
 }
@@ -19,6 +20,7 @@ const ToDoListContext = createContext<TodoContextType>({
     items: [],
     addItem: () => { },
     updateCrafted: () => { },
+    updateRequired: () => { },
     removeItem: () => { },
     clearAll: () => { },
 });
@@ -54,6 +56,12 @@ export const ToDoListProvider = ({ children }: { children: React.ReactNode }) =>
         );
     };
 
+    const updateRequired = (itemID: string, required: number) => {
+        setItems((prev) =>
+            prev.map((i) => (i.itemID === itemID ? { ...i, required } : i))
+        );
+    };
+
     const removeItem = (itemID: string) => {
         setItems((prev) => prev.filter((i) => i.itemID !== itemID));
     };
@@ -64,7 +72,7 @@ export const ToDoListProvider = ({ children }: { children: React.ReactNode }) =>
 
     return (
         <ToDoListContext.Provider
-            value={{ items, addItem, updateCrafted, removeItem, clearAll }}
+            value={{ items, addItem, updateCrafted, updateRequired, removeItem, clearAll }}
         >
             {children}
         </ToDoListContext.Provider>
