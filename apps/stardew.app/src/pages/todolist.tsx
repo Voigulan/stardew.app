@@ -63,6 +63,32 @@ export default function TodoPage() {
 					crafted={item.crafted}
 				/>
 			))}
+
+            {/* Summary Row */}
+            {items.length > 0 && (
+                <div className="mt-8 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4">
+                    <h2 className="text-lg font-semibold mb-2">Total Required Ingredients</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {aggregateIngredients(items).map((ing) => (
+                            <div
+                                key={ing.id}
+                                className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+                            >
+                                <img
+                                    src={ing.iconURL}
+                                    alt={ing.name}
+                                    width={24}
+                                    height={24}
+                                    className="rounded-sm"
+                                />
+                                <span>
+                                    {ing.total}x {ing.name}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 		</div>
 	);
 }
