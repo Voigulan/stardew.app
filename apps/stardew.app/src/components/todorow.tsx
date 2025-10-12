@@ -33,12 +33,34 @@ export const TodoRow = ( todoItem : TodoItem) => {
 					height={48}
 					className="rounded-sm"
 				/>
-				<div className="flex-1 min-w-0">
+				<div className="flex min-w-0">
 					<h3 className="font-semibold truncate">{name}</h3>
-					<p className="text-sm text-neutral-500 dark:text-neutral-400 truncate">
-						{description}
-					</p>
 				</div>
+
+                {/* Ingredients */}
+                {ingredients.length > 0 && (
+                    <div className="flex-1 items-left gap-2">
+                        <div className="flex flex-wrap gap-2">
+                            {ingredients.map((ing) => (
+                                <div
+                                    key={ing.id}
+                                    className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+                                >
+                                    <Image
+                                        src={ing.iconURL}
+                                        alt={ing.name}
+                                        width={24}
+                                        height={24}
+                                        className="rounded-sm"
+                                    />
+                                    <span>
+                                        {ing.amount}x {ing.name}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
 				{/* Controls */}
 				<div className="flex items-center gap-2">
@@ -57,32 +79,7 @@ export const TodoRow = ( todoItem : TodoItem) => {
 				</div>
 			</div>
 
-			{/* Ingredients */}
-			{ingredients.length > 0 && (
-				<div className="mt-3">
-					<Separator className="my-2" />
-					<h4 className="text-sm font-semibold mb-2">Ingredients</h4>
-					<div className="flex flex-wrap gap-2">
-						{ingredients.map((ing) => (
-							<div
-								key={ing.id}
-								className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
-							>
-								<Image
-									src={ing.iconURL}
-									alt={ing.name}
-									width={24}
-									height={24}
-									className="rounded-sm"
-								/>
-								<span>
-									{ing.amount}x {ing.name}
-								</span>
-							</div>
-						))}
-					</div>
-				</div>
-			)}
+			
             <Separator className="my-2" />
 			{/* Unlock Requirements */}
             <section className="space-y-2">
