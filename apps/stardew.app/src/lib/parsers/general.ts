@@ -63,8 +63,8 @@ function parseStardrops(player: any): StardropsRet {
 }
 
 /* ------------------------------ skills parser ----------------------------- */
-type Skill = "farming" | "fishing" | "foraging" | "mining" | "combat" | "luck";
-type SkillsRet = Record<Skill, number>;
+export type Skill = "farming" | "fishing" | "foraging" | "mining" | "combat" | "luck";
+export type SkillsRet = Record<Skill, number>;
 
 function parseSkills(player: any): SkillsRet {
 	/*

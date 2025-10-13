@@ -4,6 +4,7 @@ import objects from "@/data/objects.json";
 import bigobjects from "@/data/big_craftables.json";
 import bigCraftables from "@/data/big_craftables.json";
 import type { CraftingRecipe, Recipe } from "@/types/recipe";
+import type { Skill, SkillsRet } from "@/lib/parsers/general"
 
 import { useState } from "react";
 import { usePlayers } from "@/contexts/players-context";
@@ -18,6 +19,19 @@ function isCraftingRecipe<U extends Recipe>(
     return "isBigCraftable" in recipe;
 }
 
+export interface SkillLevel {
+    skill: Skill;
+    level: number;
+}
+const validSkills: Skill[] = ["farming", "fishing", "foraging", "mining", "combat", "luck"];
+
+export function castSkill(skillStr: string): Skill {
+    if(validSkills.includes(skillStr as Skill)) {
+        return skillStr as Skill;
+    }
+    console.error(`Invalid skill: ${skillStr}`);
+    return validSkills[0]
+}
 
 /**
  * Finds the crafting recipe and related display info for a given itemID.
@@ -55,7 +69,12 @@ export function getRecipeData(itemID: string) {
 			};
 		}) ?? [];
 
-	const unlocks = recipe?.sources ?? null;
+    let unlockConditionField = recipe.unlockConditions.split(" ")
+    
+    const unlock: SkillLevel = { 
+        skill: castSkill(unlockConditionField[4] ?? ""),
+        level: Number(unlockConditionField[2] ?? "")
+    };
 
 	return {
 		recipe,
@@ -64,6 +83,6 @@ export function getRecipeData(itemID: string) {
 		iconURL,
 		isBigCraftable,
 		ingredients,
-		unlocks,
+		unlock,
 	};
 }

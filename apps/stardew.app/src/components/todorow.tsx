@@ -15,8 +15,8 @@ export const TodoRow = ( todoItem : TodoItem) => {
 		description,
 		iconURL,
 		ingredients,
-		unlocks,
 		isBigCraftable,
+        unlock,
 	} = data;
 
 	const handleIncrement = () => updateRequired(todoItem.itemID, todoItem.required + 1);
@@ -81,22 +81,9 @@ export const TodoRow = ( todoItem : TodoItem) => {
 
 			
             <Separator className="my-2" />
-			{/* Unlock Requirements */}
-            <section className="space-y-2">
-                <h4 className="text-sm font-semibold mb-2">How to unlock</h4>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    {recipe.unlockConditions}
-                </p>
-            </section>
-			{unlocks && unlocks.length > 0 && (
+			{unlock.skill && unlock.level && (
 				<div className="mt-3">
-					<Separator className="my-2" />
-					<h4 className="text-sm font-semibold mb-1">Unlocks</h4>
-					<ul className="list-disc list-inside text-sm text-neutral-600 dark:text-neutral-400">
-						{unlocks.map((src, idx) => (
-							<li key={idx}>{src}</li>
-						))}
-					</ul>
+					unlock: {unlock.skill} lvl {unlock.level}
 				</div>
 			)}
 		</div>
