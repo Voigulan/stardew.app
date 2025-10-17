@@ -46,6 +46,7 @@ export interface PlayerType {
 	powers?: PowersRet;
 	rarecrows?: RarecrowRet;
 	animals?: AnimalsData;
+	currentSeason?: string;
 }
 
 interface PlayersContextProps {

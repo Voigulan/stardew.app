@@ -172,6 +172,7 @@ export function parseSaveFile(xml: string) {
 					horse: player.horseName,
 				},
 				raccoon: parsedRaccoon,
+                currentSeason: saveFile.SaveGame.currentSeason,
 			};
 			processedPlayers.push(processedPlayer);
 		});

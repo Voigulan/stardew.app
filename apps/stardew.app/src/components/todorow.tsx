@@ -101,8 +101,8 @@ export const TodoRow = ( todoItem : TodoItem) => {
                         className="rounded-sm"
 				    />
                     <span>
-                        lvl {unlock.level} 
-                        {skillLookup(unlock.skill).level && (
+                        lvl {unlock.level}
+                        {(skillLookup(unlock.skill).level != 0) && (
                             <div>
                                 (lvl {skillLookup(unlock.skill).level} @ {skillLookup(unlock.skill).progress.toString()} %)
                             </div>

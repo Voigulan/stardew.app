@@ -29,8 +29,8 @@ export interface SkillLevel {
 const validSkills: Skill[] = ["farming", "fishing", "foraging", "mining", "combat", "luck"];
 
 export function castSkill(skillStr: string): Skill {
-	if(validSkills.includes(skillStr as Skill)) {
-		return skillStr as Skill;
+	if(validSkills.includes(skillStr.toLowerCase() as Skill)) {
+		return skillStr.toLowerCase() as Skill;
 	}
 	console.error(`Invalid skill: ${skillStr}`);
 	return validSkills[0]
@@ -55,7 +55,8 @@ export interface SkillDisplay {
 
 function capitalizeFirstLetter(str: string): string {
 	if (str.length === 0) return str; // If the string is empty, return it as-is.
-	return str.charAt(0).toUpperCase() + str.slice(1);
+	var capStr = str
+	return capStr.charAt(0).toUpperCase() + capStr.slice(1);
 }
 
 export function useItemLookup() {
