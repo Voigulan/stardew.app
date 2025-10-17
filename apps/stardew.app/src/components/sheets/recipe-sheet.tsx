@@ -221,6 +221,7 @@ export const RecipeSheet = <T extends Recipe>({
 									onClick={() =>
                                         addItem({
                                         itemID: recipe.itemID,
+                                        itemType: "CraftingItem",
                                         required: 1,
                                         crafted: 0,
                                         })

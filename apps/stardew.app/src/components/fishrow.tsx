@@ -1,18 +1,20 @@
 import Image from "next/image";
 
 import { 
-    getFishData,
+	getFishData,
  } from "@/lib/item-lookup";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
 
 
-export const FishRow = ( todoItem : TodoItem) => {
+export const FishRow = (todoItem: TodoItem) => {
 	const { updateRequired } = useTodo();
+	if (todoItem.itemType !== "Fish") return null; // Ensure correct itemType
+
 	const data = getFishData(todoItem.itemID);
 	if (!data) return null;
 
 	const {
-        fish,
+		fish,
 		name,
 		description,
 		iconURL,
@@ -30,21 +32,19 @@ export const FishRow = ( todoItem : TodoItem) => {
 				/>
 
 				{/* Controls */}
-                x
-                <input
-                    type="number"
-                    value={todoItem.required}
-                    onChange={(e) => updateRequired(todoItem.itemID, Number(e.target.value))}
-                    
-                    style={{
-                        border: '1px solid #ccc',
-                        borderRadius: '8px',
-                        padding: '5px 10px',
-                        fontSize: '14px',
-                        width: '60px',
-                        textAlign: 'left',
-                    }}
-                />
+				<input
+					type="number"
+					value={todoItem.required}
+					onChange={(e) => updateRequired(todoItem.itemID, todoItem.itemType, Number(e.target.value))}
+					style={{
+						border: '1px solid #ccc',
+						borderRadius: '8px',
+						padding: '5px 10px',
+						fontSize: '14px',
+						width: '60px',
+						textAlign: 'left',
+					}}
+				/>
 			</div>
 		</div>
 	);

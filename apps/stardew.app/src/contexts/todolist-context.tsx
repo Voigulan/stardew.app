@@ -1,8 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { CraftingRecipe, Recipe } from "@/types/recipe";
+import { Type } from "typescript";
+import type { FishType } from "@/types/items";
 
+export type ItemType = FishType | Recipe;
 export interface TodoItem {
     itemID: string;
+    itemType: string;
     required: number;
     crafted: number;
 }
@@ -11,8 +15,8 @@ interface TodoContextType {
     items: TodoItem[];
     addItem: (item: TodoItem) => void;
     updateCrafted: (itemID: string, crafted: number) => void;
-    updateRequired: (itemID: string, required: number) => void;
-    removeItem: (itemID: string) => void;
+    updateRequired: (itemID: string, itemType: string, required: number) => void;
+    removeItem: (itemID: string, itemType: string) => void;
     clearAll: () => void;
 }
 
@@ -45,7 +49,7 @@ export const ToDoListProvider = ({ children }: { children: React.ReactNode }) =>
 
     const addItem = (item: TodoItem) => {
         setItems((prev) => {
-            if (prev.some((i) => i.itemID === item.itemID)) return prev; // prevent duplicates
+            if (prev.some((i) => i.itemID === item.itemID && i.itemType === item.itemType)) return prev; // prevent duplicates
             return [...prev, item];
         });
     };
@@ -56,19 +60,20 @@ export const ToDoListProvider = ({ children }: { children: React.ReactNode }) =>
         );
     };
 
-    const updateRequired = (itemID: string, required: number) => {
-        if(required == 0) {
-            removeItem(itemID);
-        }
-        else {
+    const updateRequired = (itemID: string, itemType: string, required: number) => {
+        if (required === 0) {
+            removeItem(itemID, itemType);
+        } else {
             setItems((prev) =>
-                prev.map((i) => (i.itemID === itemID ? { ...i, required } : i))
+                prev.map((i) =>
+                    i.itemID === itemID && i.itemType === itemType ? { ...i, required } : i
+                )
             );
         }
     };
 
-    const removeItem = (itemID: string) => {
-        setItems((prev) => prev.filter((i) => i.itemID !== itemID));
+    const removeItem = (itemID: string, itemType: string) => {
+        setItems((prev) => prev.filter((i) => i.itemID !== itemID || i.itemType !== itemType));
     };
 
     const clearAll = () => {

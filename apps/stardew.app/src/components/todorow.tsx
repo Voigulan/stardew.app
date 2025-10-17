@@ -2,32 +2,34 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { 
-    getRecipeData,
-    SkillDisplay,
-    useItemLookup,
+	getRecipeData,
+	SkillDisplay,
+	useItemLookup,
  } from "@/lib/item-lookup";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
 
 export const TodoRow = ( todoItem : TodoItem) => {
 	const { updateRequired, removeItem } = useTodo();
+	if (todoItem.itemType !== "CraftingItem") return null; // Ensure correct itemType
+
 	const data = getRecipeData(todoItem.itemID);
 	if (!data) return null;
 
 	const {
-        recipe,
+		recipe,
 		name,
 		description,
 		iconURL,
 		ingredients,
 		isBigCraftable,
-        unlock,
+		unlock,
 	} = data;
 
-	const handleIncrement = () => updateRequired(todoItem.itemID, todoItem.required + 1);
-	const handleDecrement = () => updateRequired(todoItem.itemID, Math.max(0, todoItem.required - 1));
-	const handleRemove = () => removeItem(todoItem.itemID);
+	const handleIncrement = () => updateRequired(todoItem.itemID, todoItem.itemType, todoItem.required + 1);
+	const handleDecrement = () => updateRequired(todoItem.itemID, todoItem.itemType, Math.max(0, todoItem.required - 1));
+	const handleRemove = () => removeItem(todoItem.itemID, todoItem.itemType);
 
-    const {
+	const {
         skillLookup
     } = useItemLookup();
 
@@ -45,30 +47,30 @@ export const TodoRow = ( todoItem : TodoItem) => {
 					<h3 className="font-semibold truncate">{name}</h3>
 				</div>
 
-                {/* Ingredients */}
-                {ingredients.length > 0 && (
-                    <div className="flex-1 items-left gap-2">
-                        <div className="flex flex-wrap gap-2">
-                            {ingredients.map((ing) => (
-                                <div
-                                    key={ing.id}
-                                    className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
-                                >
-                                    <Image
-                                        src={ing.iconURL}
-                                        alt={ing.name}
-                                        width={24}
-                                        height={24}
-                                        className="rounded-sm"
-                                    />
-                                    <span>
-                                        {ing.amount}x {ing.name}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+				{/* Ingredients */}
+				{ingredients.length > 0 && (
+					<div className="flex-1 items-left gap-2">
+						<div className="flex flex-wrap gap-2">
+							{ingredients.map((ing) => (
+								<div
+									key={ing.id}
+									className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+								>
+									<Image
+										src={ing.iconURL}
+										alt={ing.name}
+										width={24}
+										height={24}
+										className="rounded-sm"
+									/>
+									<span>
+										{ing.amount}x {ing.name}
+									</span>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
 
 				{/* Controls */}
 				<div className="flex items-center gap-2">

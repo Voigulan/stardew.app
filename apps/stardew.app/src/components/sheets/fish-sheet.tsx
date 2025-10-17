@@ -158,6 +158,7 @@ export const FishSheet = ({ open, setIsOpen, fish }: Props) => {
                                     onClick={() =>
                                         addItem({
                                         itemID: fish.itemID,
+                                        itemType: "Fish",
                                         required: 1,
                                         crafted: 0,
                                         })

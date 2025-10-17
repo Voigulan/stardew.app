@@ -24,6 +24,8 @@ function aggregateIngredients(items: TodoItem[]) {
 	const totals: Record<string, { id: string; name: string; iconURL: string; total: number }> = {};
 
 	for (const item of items) {
+		if (item.itemType !== "CraftingItem") continue; // Only aggregate crafting items
+
 		const data = getRecipeData(item.itemID);
 		if (!data) continue;
 
@@ -49,57 +51,55 @@ export default function TodoPage() {
 	const { items } = useTodo();
 
 	return (
-		<div className="p-6">
+		<div className="p-7">
 			<h1 className="text-2xl font-bold mb-4">Crafting To-Do List</h1>
 
 			{items.length === 0 && (
 				<p className="text-neutral-500">No crafting tasks yet.</p>
 			)}
 
-            {/* ToDo Items List */}
+			{/* ToDo Items List */}
 			{items.map((item) => (
-				<TodoRow
-					key={item.itemID}
-					itemID={item.itemID}
-					required={item.required}
-					crafted={item.crafted}
-				/>
+				item.itemType === "CraftingItem" ? (
+					<TodoRow
+						{...item}
+					/>
+				) : (<div></div>)
 			))}
 
-            {/* Summary Row */}
-            {items.length > 0 && (
-                <div className="mt-8 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4">
-                    <h2 className="text-lg font-semibold mb-2">Total Required Ingredients</h2>
-                    <div className="flex flex-wrap gap-3">
-                        {aggregateIngredients(items).map((ing) => (
-                            <div
-                                key={ing.id}
-                                className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
-                            >
-                                <img
-                                    src={ing.iconURL}
-                                    alt={ing.name}
-                                    width={24}
-                                    height={24}
-                                    className="rounded-sm"
-                                />
-                                <span>
-                                    {ing.total}x {ing.name}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+			{/* Summary Row */}
+			{items.some((item) => item.itemType === "CraftingItem") && (
+				<div className="mt-8 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4">
+					<h2 className="text-lg font-semibold mb-2">Total Required Ingredients</h2>
+					<div className="flex flex-wrap gap-3">
+						{aggregateIngredients(items).map((ing) => (
+							<div
+								key={ing.id}
+								className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+							>
+								<img
+									src={ing.iconURL}
+									alt={ing.name}
+									width={24}
+									height={24}
+									className="rounded-sm"
+								/>
+								<span>
+									{ing.total}x {ing.name}
+								</span>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 
-            {/* Fish Row */}
+			{/* Fish Row */}
 			{items.map((item) => (
-				<FishRow
-					key={item.itemID}
-					itemID={item.itemID}
-					required={item.required}
-					crafted={item.crafted}
-				/>
+				item.itemType === "Fish" ? (
+					<FishRow
+						{...item}
+					/>
+				) : (<div></div>)
 			))}
 		</div>
 	);
