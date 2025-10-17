@@ -16,6 +16,8 @@ import { X } from "lucide-react";
 import big_craftables from "@/data/big_craftables.json";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
 import { TodoRow } from "@/components/todorow";
+import { FishRow } from "@/components/fishrow";
+
 import { getRecipeData } from "@/lib/item-lookup";
 
 function aggregateIngredients(items: TodoItem[]) {
@@ -89,6 +91,16 @@ export default function TodoPage() {
                     </div>
                 </div>
             )}
+
+            {/* Fish Row */}
+			{items.map((item) => (
+				<FishRow
+					key={item.itemID}
+					itemID={item.itemID}
+					required={item.required}
+					crafted={item.crafted}
+				/>
+			))}
 		</div>
 	);
 }

@@ -9,6 +9,8 @@ import { usePlayerAchievements } from "@/contexts/skills"
 
 import { useState } from "react";
 import { usePlayers } from "@/contexts/players-context";
+import { FishType } from "@/types/items";
+import fishes from "@/data/fish.json";
 
 
 // accepts any type that extends Recipe (CraftingRecipe, CookingRecipe, etc.)
@@ -79,6 +81,32 @@ export function useItemLookup() {
     return {
         skillLookup
     }
+}
+
+export function getFishData(itemID: string) {
+    const fish =
+		fishes[itemID as keyof typeof fishes] as FishType | undefined;
+
+    if (!fish) {
+        console.warn(`getFishData: No fish found for itemID=${itemID}`);
+        return null;
+    }
+
+    const iconURL =
+		fish && `https://cdn.stardew.app/images/(O)${fish.itemID}.webp`;
+
+	const name =
+		fish && objects[fish.itemID.toString() as keyof typeof objects].name;
+
+	const description =
+		fish && objects[fish.itemID.toString() as keyof typeof objects].description;
+
+    return {
+        fish,
+        name,
+        description,
+        iconURL,
+    };
 }
 
 /**

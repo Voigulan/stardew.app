@@ -7,6 +7,7 @@ import type { FishType } from "@/types/items";
 import { Dispatch, SetStateAction, useContext, useMemo } from "react";
 
 import { PlayersContext } from "@/contexts/players-context";
+import { useTodo } from "@/contexts/todolist-context";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -39,6 +40,7 @@ interface Props {
 export const FishSheet = ({ open, setIsOpen, fish }: Props) => {
 	const { activePlayer, patchPlayer } = useContext(PlayersContext);
 	const { selectedItems, clearSelection } = useMultiSelect();
+    const { addItem } = useTodo();
 	const isDesktop = useMediaQuery("(min-width: 768px)");
 
 	const fishCaught = useMemo(() => {
@@ -150,6 +152,24 @@ export const FishSheet = ({ open, setIsOpen, fish }: Props) => {
 										Set Caught
 									</Button>
 								)}
+                            {fish?.itemID != undefined ? (
+                                <Button
+                                    variant={false ? "default" : "outline"}
+                                    onClick={() =>
+                                        addItem({
+                                        itemID: fish.itemID,
+                                        required: 1,
+                                        crafted: 0,
+                                        })
+                                    }
+                                    disabled={
+                                        //TODO: !activePlayer
+                                        false
+                                    }
+                                >
+                                    Add to To-Do List
+                                </Button>
+                            ):("")}
 							</>
 						)}
 						{!activePlayer && <CreatePlayerRedirect />}

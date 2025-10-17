@@ -57,9 +57,14 @@ export const ToDoListProvider = ({ children }: { children: React.ReactNode }) =>
     };
 
     const updateRequired = (itemID: string, required: number) => {
-        setItems((prev) =>
-            prev.map((i) => (i.itemID === itemID ? { ...i, required } : i))
-        );
+        if(required == 0) {
+            removeItem(itemID);
+        }
+        else {
+            setItems((prev) =>
+                prev.map((i) => (i.itemID === itemID ? { ...i, required } : i))
+            );
+        }
     };
 
     const removeItem = (itemID: string) => {
