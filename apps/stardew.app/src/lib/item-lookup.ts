@@ -5,6 +5,7 @@ import bigobjects from "@/data/big_craftables.json";
 import bigCraftables from "@/data/big_craftables.json";
 import type { CraftingRecipe, Recipe } from "@/types/recipe";
 import type { Skill, SkillsRet } from "@/lib/parsers/general"
+import { usePlayerAchievements } from "@/contexts/skills"
 
 import { useState } from "react";
 import { usePlayers } from "@/contexts/players-context";
@@ -31,6 +32,53 @@ export function castSkill(skillStr: string): Skill {
     }
     console.error(`Invalid skill: ${skillStr}`);
     return validSkills[0]
+}
+
+export const skillUrls: Record<Skill, string> = {
+    farming:    "8/82/Farming_Skill_Icon.png", 
+    fishing:    "e/e7/Fishing_Skill_Icon.png", 
+    foraging:   "f/f1/Foraging_Skill_Icon.png", 
+    mining:     "2/2f/Mining_Skill_Icon.png", 
+    combat:     "c/cf/Combat_Skill_Icon.png", 
+    luck:       "", // unused as of 1.5
+}
+
+export interface SkillDisplay {
+    skill: Skill;
+    title: string;
+    iconURL: string;
+    level: number;
+    progress: number;
+}
+
+function capitalizeFirstLetter(str: string): string {
+    if (str.length === 0) return str; // If the string is empty, return it as-is.
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function useItemLookup() {
+    const { activePlayer } = usePlayers();
+    const { 
+            playerExperiencePoints,
+            masteryExp,
+            playerPowers,
+            getAchievementProgress 
+        } = usePlayerAchievements();
+
+    function skillLookup(skillStr: string): SkillDisplay {
+        const baseURL: string = "https://stardewvalleywiki.com/mediawiki/images/"
+        const skill: Skill = castSkill(skillStr);
+        return {
+            skill: skill,
+            title: capitalizeFirstLetter(skillStr),
+            iconURL: skillUrls[skill] ? baseURL+skillUrls[skill] : "",
+            level: activePlayer?.general?.skills?.[skill] ?? 0,
+            progress: playerExperiencePoints[skill].percentage
+        };
+    }
+    return {
+        skillLookup
+    }
 }
 
 /**

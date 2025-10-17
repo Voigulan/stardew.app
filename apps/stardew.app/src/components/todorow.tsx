@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { getRecipeData } from "@/lib/item-lookup";
+import { 
+    getRecipeData,
+    SkillDisplay,
+    useItemLookup,
+ } from "@/lib/item-lookup";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
 
 export const TodoRow = ( todoItem : TodoItem) => {
@@ -22,6 +26,10 @@ export const TodoRow = ( todoItem : TodoItem) => {
 	const handleIncrement = () => updateRequired(todoItem.itemID, todoItem.required + 1);
 	const handleDecrement = () => updateRequired(todoItem.itemID, Math.max(0, todoItem.required - 1));
 	const handleRemove = () => removeItem(todoItem.itemID);
+
+    const {
+        skillLookup
+    } = useItemLookup();
 
 	return (
 		<div className="rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm mb-4">
@@ -79,12 +87,26 @@ export const TodoRow = ( todoItem : TodoItem) => {
 				</div>
 			</div>
 
-			
-            <Separator className="my-2" />
-			{unlock.skill && unlock.level && (
-				<div className="mt-3">
-					unlock: {unlock.skill} lvl {unlock.level}
-				</div>
+			{unlock.skill && unlock.level && 
+            ( (skillLookup(unlock.skill).level==undefined) || (skillLookup(unlock.skill).level<unlock.level) )
+             && (
+                <div className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm">
+                    <Image
+                        src={skillLookup(unlock.skill).iconURL}
+                        alt={unlock.skill}
+                        width={24}
+                        height={24}
+                        className="rounded-sm"
+				    />
+                    <span>
+                        lvl {unlock.level} 
+                        {skillLookup(unlock.skill).level && (
+                            <div>
+                                (lvl {skillLookup(unlock.skill).level} @ {skillLookup(unlock.skill).progress.toString()} %)
+                            </div>
+                        )}
+                    </span>
+                </div>
 			)}
 		</div>
 	);
