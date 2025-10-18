@@ -19,6 +19,7 @@ import { TodoRow } from "@/components/todorow";
 import { FishRow } from "@/components/fishrow";
 
 import { getRecipeData } from "@/lib/item-lookup";
+import { useItemLookup, getFishData } from "@/lib/item-lookup";
 
 function aggregateIngredients(items: TodoItem[]) {
 	const totals: Record<string, { id: string; name: string; iconURL: string; total: number }> = {};
@@ -49,7 +50,30 @@ function aggregateIngredients(items: TodoItem[]) {
 
 export default function TodoPage() {
 	const { items } = useTodo();
+	const { timeTilFishSeason } = useItemLookup();
 
+	// Sort fish by timeTilFishSeason
+	const sortedFish = items
+		.filter((item) => item.itemType === "Fish")
+		.map((item) => ({
+			...item,
+			timeUntilSeason: timeTilFishSeason(getFishData(item.itemID)?.fish),
+		}))
+		.sort((a, b) => a.timeUntilSeason - b.timeUntilSeason);
+
+	// Group fish by priority
+	const groupedFish = sortedFish.reduce<[
+        typeof sortedFish,
+        typeof sortedFish,
+        typeof sortedFish
+    ]>((groups, fish) => {
+		if (!groups[fish.timeUntilSeason]) {
+			groups[fish.timeUntilSeason] = [];
+		}
+		groups[fish.timeUntilSeason].push(fish);
+		return groups;
+	}, [[],[],[]]);
+    
 	return (
 		<div className="p-7">
 			<h1 className="text-2xl font-bold mb-4">Crafting To-Do List</h1>
@@ -93,14 +117,23 @@ export default function TodoPage() {
 				</div>
 			)}
 
-			{/* Fish Row */}
-			{items.map((item) => (
-				item.itemType === "Fish" ? (
-					<FishRow
-						{...item}
-					/>
-				) : (<div></div>)
-			))}
+            {/* Fish Grid */}
+			{Object.entries(groupedFish).map(([priority, fishGroup]) => {
+                if (fishGroup.length === 0) return null; // Skip rendering this group if there's no fish
+
+                return (
+                    <div key={priority} className="mt-8">
+                    <h2 className="text-lg font-semibold mb-2">
+                        {priority === "0" ? "Available Now" : (priority === "1" ? "Available next Season" : "Available in many Seasons")}
+                    </h2>
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-8">
+                        {fishGroup.map((fish) => (
+                            <FishRow key={fish.itemID} {...fish} />
+                        ))}
+                    </div>
+                    </div>
+                );
+            })}
 		</div>
 	);
 }

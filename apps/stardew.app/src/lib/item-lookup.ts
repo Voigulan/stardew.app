@@ -82,7 +82,7 @@ export function useItemLookup() {
 		};
 	}
 
-    function timeTilFishSeason(fish: FishType): number {
+    function timeTilFishSeason(fish: FishType | undefined): number {
         if (!fish || !activePlayer?.currentSeason) return 3;
 
         if ("seasons" in fish) {

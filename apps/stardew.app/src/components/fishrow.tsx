@@ -29,7 +29,6 @@ export const FishRow = (todoItem: TodoItem) => {
 	const bubbleColors = useMemo(() => {
 		if (!activePlayer) return "border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950";
 		const timeUntilSeason = timeTilFishSeason(fish);
-		console.log("timeUntilSeason: "+timeUntilSeason);
 		switch (timeUntilSeason) {
 			case 0:
 				return "border-green-900 bg-green-500/20";		// go fishing now
