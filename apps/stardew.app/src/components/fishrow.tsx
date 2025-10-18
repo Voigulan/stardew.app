@@ -3,6 +3,7 @@ import { useContext, useMemo } from "react";
 
 import { 
 	getFishData,
+	useItemLookup,
  } from "@/lib/item-lookup";
 import { PlayersContext } from "@/contexts/players-context";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
@@ -11,6 +12,8 @@ import { TodoItem, useTodo } from "@/contexts/todolist-context";
 export const FishRow = (todoItem: TodoItem) => {
 	const { activePlayer } = useContext(PlayersContext);
 	const { updateRequired } = useTodo();
+	const { timeTilFishSeason } = useItemLookup();
+
 	if (todoItem.itemType !== "Fish") return null; // Ensure correct itemType
 
 	const data = getFishData(todoItem.itemID);
@@ -23,17 +26,24 @@ export const FishRow = (todoItem: TodoItem) => {
 		iconURL,
 	} = data;
 
-	const isFishInSeason = useMemo(() => {
-		if (!fish || !activePlayer?.currentSeason) return false;
-		if ("seasons" in fish) {
-			// Below: case-insensitive alternative to .includes()
-			return !!fish.seasons.find(el => el.toLowerCase() === activePlayer?.currentSeason?.toLowerCase());
+	const bubbleColors = useMemo(() => {
+		if (!activePlayer) return "border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950";
+		const timeUntilSeason = timeTilFishSeason(fish);
+		console.log("timeUntilSeason: "+timeUntilSeason);
+		switch (timeUntilSeason) {
+			case 0:
+				return "border-green-900 bg-green-500/20";		// go fishing now
+			case 1:
+				return "border-yellow-900 bg-yellow-500/20";	// wait one Season
+			default:
+				return "border-grey bg-grey-500/20";			// far, far future
 		}
-		else return true;
-	}, [fish, activePlayer?.currentSeason]);
+	}, [activePlayer, fish, timeTilFishSeason]);
 
 	return (
-		<div className="rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm mb-4">
+		<div
+			className={`rounded-lg ${bubbleColors} border p-4 shadow-sm mb-4`}
+		>
 			<div className="flex items-center gap-4">
 				<Image
 					src={iconURL}
@@ -43,26 +53,18 @@ export const FishRow = (todoItem: TodoItem) => {
 					className="rounded-sm"
 				/>
 
-				{activePlayer && (
-				<p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-					{isFishInSeason
-						? `This fish is available in the current season (${activePlayer.currentSeason}).`
-						: `This fish is not available in the current season (${activePlayer.currentSeason}).`}
-				</p>
-				)}
-
 				{/* Controls */}
 				<input
 					type="number"
 					value={todoItem.required}
 					onChange={(e) => updateRequired(todoItem.itemID, todoItem.itemType, Number(e.target.value))}
 					style={{
-						border: '1px solid #ccc',
-						borderRadius: '8px',
-						padding: '5px 10px',
-						fontSize: '14px',
-						width: '60px',
-						textAlign: 'left',
+						border: "1px solid #ccc",
+						borderRadius: "8px",
+						padding: "5px 10px",
+						fontSize: "14px",
+						width: "60px",
+						textAlign: "left",
 					}}
 				/>
 			</div>

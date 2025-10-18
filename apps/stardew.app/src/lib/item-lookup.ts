@@ -28,6 +28,8 @@ export interface SkillLevel {
 }
 const validSkills: Skill[] = ["farming", "fishing", "foraging", "mining", "combat", "luck"];
 
+const seasonList: string[] = ["spring", "summer", "fall", "winter"];
+
 export function castSkill(skillStr: string): Skill {
 	if(validSkills.includes(skillStr.toLowerCase() as Skill)) {
 		return skillStr.toLowerCase() as Skill;
@@ -79,8 +81,39 @@ export function useItemLookup() {
 			progress: playerExperiencePoints[skill].percentage
 		};
 	}
+
+    function timeTilFishSeason(fish: FishType): number {
+        if (!fish || !activePlayer?.currentSeason) return 3;
+
+        if ("seasons" in fish) {
+            if (fish.seasons.includes("all")) return 0;
+
+            const currentSeason = activePlayer.currentSeason.toLowerCase();
+            const currentSeasonIdx = seasonList.indexOf(currentSeason);
+
+            if (currentSeasonIdx === -1) {
+                console.error(`Invalid current season: ${currentSeason}`);
+                return 3;
+            }
+
+            const seasonDistances = fish.seasons.map(season => {
+                const seasonIdx = seasonList.indexOf(season.toLowerCase());
+                if (seasonIdx === -1) {
+                    console.error(`Invalid fish season: ${season}`);
+                    return 3;
+                }
+                return (seasonIdx - currentSeasonIdx + 4) % 4; // Ensure positive modulo
+            });
+
+            return Math.min(...seasonDistances);
+        }
+
+        return 3;
+    }
+
 	return {
-		skillLookup
+		skillLookup,
+        timeTilFishSeason
 	}
 }
 
