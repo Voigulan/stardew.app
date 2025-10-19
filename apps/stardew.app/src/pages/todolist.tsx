@@ -99,6 +99,24 @@ export default function TodoPage() {
 				) : (<div></div>)
 			))}
 
+            {/* Fish Grid */}
+			{Object.entries(groupedFish).map(([priority, fishGroup]) => {
+                if (fishGroup.length === 0) return null; // Skip rendering this group if there's no fish
+
+                return (
+                    <div key={priority} className="mt-8">
+                    <h2 className="text-lg font-semibold mb-2">
+                        {priority === "0" ? "Available Now" : (priority === "1" ? "Available next Season" : "Available in many Seasons")}
+                    </h2>
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6">
+                        {fishGroup.map((fish) => (
+                            <FishRow key={fish.itemID} {...fish} />
+                        ))}
+                    </div>
+                    </div>
+                );
+            })}
+
 			{/* Summary Row */}
 			{items.some((item) => item.itemType === "CraftingItem") && (
 				<div className="mt-8 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4">
@@ -125,23 +143,44 @@ export default function TodoPage() {
 				</div>
 			)}
 
-            {/* Fish Grid */}
-			{Object.entries(groupedFish).map(([priority, fishGroup]) => {
-                if (fishGroup.length === 0) return null; // Skip rendering this group if there's no fish
+            {/* Other Items Row */}
+            {items.some(
+                (item) => item.itemType !== "CraftingItem" && item.itemType !== "Cooking"
+            ) && (
+                <div className="mt-8 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-4">
+                    <h2 className="text-lg font-semibold mb-2">Other Items</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {items
+                            .filter(
+                                (item) =>
+                                    item.itemType !== "CraftingItem" &&
+                                    item.itemType !== "Cooking"
+                            )
+                            .map((item) => {
+                                const ing = getItemData(item); // Lookup additional data for the item
 
-                return (
-                    <div key={priority} className="mt-8">
-                    <h2 className="text-lg font-semibold mb-2">
-                        {priority === "0" ? "Available Now" : (priority === "1" ? "Available next Season" : "Available in many Seasons")}
-                    </h2>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6">
-                        {fishGroup.map((fish) => (
-                            <FishRow key={fish.itemID} {...fish} />
-                        ))}
+                                return (
+                                    <div
+                                        key={ing.item.itemID}
+                                        className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+                                    >
+                                        <img
+                                            src={ing.iconURL}
+                                            alt={ing.name}
+                                            width={24}
+                                            height={24}
+                                            className="rounded-sm"
+                                        />
+                                        <span>
+                                            {item.required}x {ing.name}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                     </div>
-                    </div>
-                );
-            })}
+                </div>
+            )}
+
 		</div>
 	);
 }
