@@ -57,7 +57,7 @@ function aggregateIngredients(items: TodoItem[]) {
 }
 
 export default function TodoPage() {
-	const { items } = useTodo();
+	const { items, updateRequired } = useTodo();
 	const { timeTilFishSeason } = useItemLookup();
 
 	// Sort fish by timeTilFishSeason
@@ -171,8 +171,23 @@ export default function TodoPage() {
                                             height={24}
                                             className="rounded-sm"
                                         />
+                                        {/* Controls */}
+                                        <input
+                                            type="number"
+                                            value={item.required}
+                                            onChange={(e) => updateRequired(item.itemID, item.itemType, Number(e.target.value))}
+                                            style={{
+                                                border: "1px solid #ccc",
+                                                borderRadius: "8px",
+                                                padding: "5px 10px",
+                                                fontSize: "14px",
+                                                width: "60px",
+                                                textAlign: "left",
+                                                background: "transparent"
+                                            }}
+                                        />
                                         <span>
-                                            {item.required}x {ing.name}
+                                            {ing.name}
                                         </span>
                                     </div>
                                 );

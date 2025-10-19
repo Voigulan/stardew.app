@@ -46,6 +46,21 @@ export const TodoRow = (todoItem: TodoItem) => {
 					height={48}
 					className="rounded-sm"
 				/>
+                {/* Controls */}
+                <input
+                    type="number"
+                    value={todoItem.required}
+                    onChange={(e) => updateRequired(todoItem.itemID, todoItem.itemType, Number(e.target.value))}
+                    style={{
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        padding: "5px 10px",
+                        fontSize: "14px",
+                        width: "60px",
+                        textAlign: "left",
+                        background: "transparent"
+                    }}
+                />
 				<div className="flex min-w-0">
 					<h3 className="font-semibold truncate">{name}</h3>
 				</div>
@@ -83,22 +98,6 @@ export const TodoRow = (todoItem: TodoItem) => {
 						</div>
 					</div>
 				)}
-
-				{/* Controls */}
-				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" onClick={handleDecrement}>
-						-
-					</Button>
-					<span className="w-5 text-center text-sm">
-						{todoItem.required}
-					</span>
-					<Button variant="outline" size="sm" onClick={handleIncrement}>
-						+
-					</Button>
-					<Button variant="ghost" size="sm" onClick={handleRemove}>
-						🗑️
-					</Button>
-				</div>
 			</div>
 
 			{unlock.skill && unlock.level && skillDisplay && (skillDisplay.level<unlock.level)
