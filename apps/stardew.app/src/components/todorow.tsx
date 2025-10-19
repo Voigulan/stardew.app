@@ -3,12 +3,13 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { 
 	getRecipeData,
+    getItemData,
 	SkillDisplay,
 	useItemLookup,
  } from "@/lib/item-lookup";
 import { TodoItem, useTodo } from "@/contexts/todolist-context";
 
-export const TodoRow = ( todoItem : TodoItem) => {
+export const TodoRow = (todoItem: TodoItem) => {
 	const { updateRequired, removeItem } = useTodo();
 	if (todoItem.itemType !== "CraftingItem") return null; // Ensure correct itemType
 
@@ -33,6 +34,8 @@ export const TodoRow = ( todoItem : TodoItem) => {
         skillLookup
     } = useItemLookup();
 
+    const skillDisplay = unlock.skill ? skillLookup(unlock.skill) : undefined;
+
 	return (
 		<div className="rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm mb-4">
 			<div className="flex items-center gap-4">
@@ -51,23 +54,32 @@ export const TodoRow = ( todoItem : TodoItem) => {
 				{ingredients.length > 0 && (
 					<div className="flex-1 items-left gap-2">
 						<div className="flex flex-wrap gap-2">
-							{ingredients.map((ing) => (
-								<div
-									key={ing.id}
-									className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
-								>
-									<Image
-										src={ing.iconURL}
-										alt={ing.name}
-										width={24}
-										height={24}
-										className="rounded-sm"
-									/>
-									<span>
-										{ing.amount}x {ing.name}
-									</span>
-								</div>
-							))}
+							{ingredients.map((ing) => {
+                                const ing_comp: TodoItem = {
+                                    itemID: ing.itemID, 
+                                    itemType: "",
+                                    required: ing.amount,
+                                    crafted: 0
+                                };
+								const item = getItemData(ing_comp);
+								return (
+									<div
+										key={ing.itemID}
+										className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm"
+									>
+										<Image
+											src={item.iconURL}
+											alt={item.name}
+											width={24}
+											height={24}
+											className="rounded-sm"
+										/>
+										<span>
+											{ing.amount}x {item.name}
+										</span>
+									</div>
+								);
+							})}
 						</div>
 					</div>
 				)}
@@ -89,12 +101,11 @@ export const TodoRow = ( todoItem : TodoItem) => {
 				</div>
 			</div>
 
-			{unlock.skill && unlock.level && 
-            ( (skillLookup(unlock.skill).level==undefined) || (skillLookup(unlock.skill).level<unlock.level) )
+			{unlock.skill && unlock.level && skillDisplay && (skillDisplay.level<unlock.level)
              && (
                 <div className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-700 rounded-md px-2 py-1 text-sm">
                     <Image
-                        src={skillLookup(unlock.skill).iconURL}
+                        src={skillDisplay.iconURL}
                         alt={unlock.skill}
                         width={24}
                         height={24}
@@ -102,9 +113,9 @@ export const TodoRow = ( todoItem : TodoItem) => {
 				    />
                     <span>
                         lvl {unlock.level}
-                        {(skillLookup(unlock.skill).level != 0) && (
+                        {(skillDisplay.level != 0) && (
                             <div>
-                                (lvl {skillLookup(unlock.skill).level} @ {skillLookup(unlock.skill).progress.toString()} %)
+                                (lvl {skillDisplay.level} @ {skillDisplay.progress.toString()} %)
                             </div>
                         )}
                     </span>

@@ -1,5 +1,7 @@
 // src/lib/getRecipeData.ts
-import recipes from "@/data/crafting.json";
+import recipes_craft from "@/data/crafting.json";
+import recipes_cook from "@/data/cooking.json";
+
 import objects from "@/data/objects.json";
 import bigobjects from "@/data/big_craftables.json";
 import bigCraftables from "@/data/big_craftables.json";
@@ -11,6 +13,9 @@ import { useState } from "react";
 import { usePlayers } from "@/contexts/players-context";
 import { FishType } from "@/types/items";
 import fishes from "@/data/fish.json";
+import { TodoItem } from "@/contexts/todolist-context";
+import { categoryIcons, goldIcons } from "@/lib/constants";
+import { exists } from "drizzle-orm";
 
 
 // accepts any type that extends Recipe (CraftingRecipe, CookingRecipe, etc.)
@@ -30,12 +35,11 @@ const validSkills: Skill[] = ["farming", "fishing", "foraging", "mining", "comba
 
 const seasonList: string[] = ["spring", "summer", "fall", "winter"];
 
-export function castSkill(skillStr: string): Skill {
+export function castSkill(skillStr: string): Skill | undefined {
 	if(validSkills.includes(skillStr.toLowerCase() as Skill)) {
 		return skillStr.toLowerCase() as Skill;
 	}
-	console.error(`Invalid skill: ${skillStr}`);
-	return validSkills[0]
+    else return undefined;
 }
 
 export const skillUrls: Record<Skill, string> = {
@@ -61,6 +65,7 @@ function capitalizeFirstLetter(str: string): string {
 	return capStr.charAt(0).toUpperCase() + capStr.slice(1);
 }
 
+
 export function useItemLookup() {
 	const { activePlayer } = usePlayers();
 	const { 
@@ -70,9 +75,13 @@ export function useItemLookup() {
 			getAchievementProgress 
 		} = usePlayerAchievements();
 
-	function skillLookup(skillStr: string): SkillDisplay {
+	function skillLookup(skillStr: string): SkillDisplay | undefined {
 		const baseURL: string = "https://stardewvalleywiki.com/mediawiki/images/"
-		const skill: Skill = castSkill(skillStr);
+		const skill: Skill | undefined = castSkill(skillStr);
+        if(skill == undefined) {
+            return undefined;
+        }
+        
 		return {
 			skill: skill,
 			title: capitalizeFirstLetter(skillStr),
@@ -149,8 +158,13 @@ export function getFishData(itemID: string) {
  * Currently supports CraftingRecipes only.
  */
 export function getRecipeData(itemID: string) {
-	const recipe =
-		recipes[itemID as keyof typeof recipes] as Recipe | undefined;
+	var recipe =
+		recipes_craft[itemID as keyof typeof recipes_craft] as Recipe | undefined;
+    
+    if (!recipe) {
+        recipe =
+            recipes_cook[itemID as keyof typeof recipes_cook] as Recipe | undefined;
+    }
 
 	if (!recipe) {
 		console.warn(`getRecipeData: No recipe found for itemID=${itemID}`);
@@ -173,7 +187,7 @@ export function getRecipeData(itemID: string) {
 		recipe?.ingredients?.map((ing) => {
 			const objData = objects[ing.itemID.toString() as keyof typeof objects];
 			return {
-				id: ing.itemID.toString(),
+				itemID: ing.itemID,
 				amount: ing.quantity,
 				name: objData?.name ?? `Item ${ing.itemID}`,
 				iconURL: `https://cdn.stardew.app/images/(O)${ing.itemID}.webp`,
@@ -197,4 +211,80 @@ export function getRecipeData(itemID: string) {
 		ingredients,
 		unlock,
 	};
+}
+
+const categoryItems: Record<string, string> = {
+	"-4": "Any Fish",
+	"-5": "Any Egg",
+	"-6": "Any Milk",
+	"-777": "Wild Seeds (Any)",
+};
+
+export function getItemData(item: TodoItem) {
+    let iconURL;
+    let name;
+    let description;
+    let itemType;
+
+    console.log("itemID="+item.itemID)
+
+	if (
+		item &&
+		item?.itemID in categoryItems
+	) {
+		iconURL = categoryIcons[item.itemID];
+		name = categoryItems[item.itemID];
+		description = "Any item in this category will work.";
+        itemType = "categoryItem"
+        console.log(description)
+	} else if (item && item.itemID == "-1") {
+		//Special case for handling gold in Vault bundles
+		if("quality" in item) {
+            let itemCopy = { ...item };
+            itemCopy.itemQuality = "0"; // For some reason they have "gold" quality in the data
+            item = itemCopy as typeof item;
+        }
+		iconURL = goldIcons[item.required.toString()];  // here: itemQuantity => required
+		name = "Gold";
+		description = "What do the Junimos need all this gold for?";
+        itemType = "Gold"
+	} else if (
+		item &&
+		!objects[item.itemID as keyof typeof objects]
+	) {
+		iconURL = `https://cdn.stardew.app/images/(O)MysteryBox.webp`;
+		name = "Unknown Object";
+		description = "We don't know what this is...";
+		// unknownItem = true;
+        itemType = "unknownItem"
+	} else {                                                    // All "Normal" items
+		iconURL =
+			(item &&
+				item !== undefined &&
+				`https://cdn.stardew.app/images/(O)${item.itemID}.webp`) ||
+			"";
+
+		name =
+			(item &&
+				item !== undefined &&
+				objects[item.itemID as keyof typeof objects].name) ||
+			"";
+
+		description =
+			(item &&
+				item !== undefined &&
+				objects[item.itemID as keyof typeof objects]
+					.description) ||
+			"";
+        itemType = "object"
+    }
+
+    return {
+		itemType: "CraftingItem", // Added itemType field
+        item,
+        name,
+		description,
+		iconURL,
+    }
+
 }

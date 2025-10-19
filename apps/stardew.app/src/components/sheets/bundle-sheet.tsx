@@ -12,6 +12,7 @@ import {
 import { Dispatch, SetStateAction, useMemo } from "react";
 
 import { usePlayers } from "@/contexts/players-context";
+import { useTodo } from "@/contexts/todolist-context";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -95,6 +96,7 @@ export default function BundleSheet({
 	bundleItemWithLocation,
 }: Props) {
 	const { activePlayer, patchPlayer } = usePlayers();
+    const { addItem } = useTodo();
 
 	const [bundles, completed] = useMemo(() => {
 		if (!activePlayer) return [[], false];
@@ -306,7 +308,35 @@ export default function BundleSheet({
 										handleItemChange={handleItemChange}
 									/>
 								)}
-								{!activePlayer && <CreatePlayerRedirect />}
+                                <Button
+									variant={false ? "default" : "outline"}
+									onClick={() =>
+                                        {
+                                            if ( (bundleItemWithLocation.itemID in ["-1", "-4", "-5", "-6", "-777"]) || 
+                                                    (!objects[bundleItemWithLocation.itemID as keyof typeof objects]) ) 
+                                            {
+                                                console.log("Special Item: "+bundleItemWithLocation.itemID);
+                                            }
+                                            else {
+                                                addItem({
+                                                    itemID: bundleItemWithLocation.itemID,
+                                                    itemType: (bundleItemWithLocation && bundleItemWithLocation !== undefined &&
+                                                        objects[bundleItemWithLocation.itemID as keyof typeof objects].category) || "",
+                                                    required: bundleItemWithLocation.itemQuantity,
+                                                    crafted: 0,
+                                                    })
+                                            }
+                                        }
+                                    }
+									disabled={
+										//TODO: !activePlayer
+                                        false
+									}
+								>
+                                    Add to To-Do List
+								</Button>
+
+                                {!activePlayer && <CreatePlayerRedirect />}
 								{name && !unknownItem && (
 									<Button
 										variant="outline"

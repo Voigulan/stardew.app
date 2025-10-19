@@ -31,17 +31,17 @@ export const FishRow = (todoItem: TodoItem) => {
 		const timeUntilSeason = timeTilFishSeason(fish);
 		switch (timeUntilSeason) {
 			case 0:
-				return "border-green-900 bg-green-500/20";		// go fishing now
+				return "green";		// go fishing now
 			case 1:
-				return "border-yellow-900 bg-yellow-500/20";	// wait one Season
+				return "yellow";	// wait one Season
 			default:
-				return "border-grey bg-grey-500/20";			// far, far future
+				return "grey";			// far, far future
 		}
 	}, [activePlayer, fish, timeTilFishSeason]);
 
 	return (
 		<div
-			className={`rounded-lg ${bubbleColors} border p-4 shadow-sm mb-4`}
+			className={`rounded-lg border-${bubbleColors}-900 bg-${bubbleColors}-500/20 border p-4 shadow-sm mb-4`}
 		>
 			<div className="flex items-center gap-4">
 				<Image
@@ -64,8 +64,10 @@ export const FishRow = (todoItem: TodoItem) => {
 						fontSize: "14px",
 						width: "60px",
 						textAlign: "left",
+                        background: "transparent"
 					}}
 				/>
+                {name}
 			</div>
 		</div>
 	);
